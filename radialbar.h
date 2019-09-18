@@ -24,111 +24,94 @@
 ** SOFTWARE.
 ************************************************************************************/
 
-#ifndef RADIALBAR_H
-#define RADIALBAR_H
+#pragma once
+
+//=======================================================
+//== Includes
+//=======================================================
 
 #include <QQuickPaintedItem>
+
+//=======================================================
+//== Class-Definition
+//=======================================================
 
 class RadialBar : public QQuickPaintedItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(qreal size READ getSize WRITE setSize NOTIFY sizeChanged)
-    Q_PROPERTY(qreal startAngle READ getStartAngle WRITE setStartAngle NOTIFY startAngleChanged)
-    Q_PROPERTY(qreal spanAngle READ getSpanAngle WRITE setSpanAngle NOTIFY spanAngleChanged)
-    Q_PROPERTY(qreal minValue READ getMinValue WRITE setMinValue NOTIFY minValueChanged)
-    Q_PROPERTY(qreal maxValue READ getMaxValue WRITE setMaxValue NOTIFY maxValueChanged)
-    Q_PROPERTY(qreal value READ getValue WRITE setValue NOTIFY valueChanged)
-    Q_PROPERTY(int dialWidth READ getDialWidth WRITE setDialWidth NOTIFY dialWidthChanged)
-    Q_PROPERTY(QColor backgroundColor READ getBackgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
-    Q_PROPERTY(QColor foregroundColor READ getForegroundColor WRITE setForegroundColor NOTIFY foregroundColorChanged)
-    Q_PROPERTY(QColor progressColor READ getProgressColor WRITE setProgressColor NOTIFY progressColorChanged)
-    Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor NOTIFY textColorChanged)
-    Q_PROPERTY(QString suffixText READ getSuffixText WRITE setSuffixText NOTIFY suffixTextChanged)
-    Q_PROPERTY(bool showText READ isShowText WRITE setShowText)
-    Q_PROPERTY(Qt::PenCapStyle penStyle READ getPenStyle WRITE setPenStyle NOTIFY penStyleChanged)
-    Q_PROPERTY(DialType dialType READ getDialType WRITE setDialType NOTIFY dialTypeChanged)
-    Q_PROPERTY(QFont textFont READ getTextFont WRITE setTextFont NOTIFY textFontChanged)
+    Q_PROPERTY(qreal size               MEMBER size             NOTIFY sizeChanged)
+    Q_PROPERTY(qreal startAngle         MEMBER startAngle       NOTIFY startAngleChanged)
+    Q_PROPERTY(qreal spanAngle          MEMBER spanAngle        NOTIFY spanAngleChanged)
+    Q_PROPERTY(qreal minValue           MEMBER minValue         NOTIFY minValueChanged)
+    Q_PROPERTY(qreal maxValue           MEMBER maxValue         NOTIFY maxValueChanged)
+    Q_PROPERTY(qreal value              MEMBER value            NOTIFY valueChanged)
+    Q_PROPERTY(int dialWidth            MEMBER dialWidth        NOTIFY dialWidthChanged)
+    Q_PROPERTY(QColor backgroundColor   MEMBER backgroundColor  NOTIFY backgroundColorChanged)
+    Q_PROPERTY(QColor foregroundColor   MEMBER foregroundColor  NOTIFY foregroundColorChanged)
+    Q_PROPERTY(QColor progressColor     MEMBER progressColor    NOTIFY progressColorChanged)
+    Q_PROPERTY(QColor textColor         MEMBER textColor        NOTIFY textColorChanged)
+    Q_PROPERTY(QString suffixText       MEMBER suffixText       NOTIFY suffixTextChanged)
+    Q_PROPERTY(bool showText            MEMBER showText         NOTIFY showTextChanged)
+    Q_PROPERTY(Qt::PenCapStyle penStyle MEMBER penStyle         NOTIFY penStyleChanged)
+    Q_PROPERTY(DialType dialType        MEMBER dialType         NOTIFY dialTypeChanged)
+    Q_PROPERTY(QFont textFont           MEMBER textFont         NOTIFY textFontChanged)
 
 public:
-    RadialBar(QQuickItem *parent = 0);
-    void paint(QPainter *painter);
 
-    enum DialType {
-        FullDial,
-        MinToMax,
-        NoDial
-    };
+    //=======================================================
+    //== Enums
+
+    enum DialType { FullDial, MinToMax, NoDial };
     Q_ENUM(DialType)
 
-    qreal getSize() {return m_Size;}
-    qreal getStartAngle() {return m_StartAngle;}
-    qreal getSpanAngle() {return m_SpanAngle;}
-    qreal getMinValue() {return m_MinValue;}
-    qreal getMaxValue() {return m_MaxValue;}
-    qreal getValue() {return m_Value;}
-    int getDialWidth() {return m_DialWidth;}
-    QColor getBackgroundColor() {return m_BackgroundColor;}
-    QColor getForegroundColor() {return m_DialColor;}
-    QColor getProgressColor() {return m_ProgressColor;}
-    QColor getTextColor() {return m_TextColor;}
-    QString getSuffixText() {return m_SuffixText;}
-    bool isShowText() {return m_ShowText;}
-    Qt::PenCapStyle getPenStyle() {return m_PenStyle;}
-    DialType getDialType() {return m_DialType;}
-    QFont getTextFont() {return m_TextFont;}
+    //=======================================================
+    //== Constructor
 
-    void setSize(qreal size);
-    void setStartAngle(qreal angle);
-    void setSpanAngle(qreal angle);
-    void setMinValue(qreal value);
-    void setMaxValue(qreal value);
-    void setValue(qreal value);
-    void setDialWidth(qreal width);
-    void setBackgroundColor(QColor color);
-    void setForegroundColor(QColor color);
-    void setProgressColor(QColor color);
-    void setTextColor(QColor color);
-    void setSuffixText(QString text);
-    void setShowText(bool show);
-    void setPenStyle(Qt::PenCapStyle style);
-    void setDialType(DialType type);
-    void setTextFont(QFont font);
+    RadialBar(QQuickItem *parent = nullptr);
 
-signals:
-    void sizeChanged();
-    void startAngleChanged();
-    void spanAngleChanged();
-    void minValueChanged();
-    void maxValueChanged();
-    void valueChanged();
-    void dialWidthChanged();
-    void backgroundColorChanged();
-    void foregroundColorChanged();
-    void progressColorChanged();
-    void textColorChanged();
-    void suffixTextChanged();
-    void penStyleChanged();
-    void dialTypeChanged();
-    void textFontChanged();
+    //=======================================================
+    //== Methods
+
+    virtual void paint(QPainter *painter) override;
 
 private:
-    qreal m_Size;
-    qreal m_StartAngle;
-    qreal m_SpanAngle;
-    qreal m_MinValue;
-    qreal m_MaxValue;
-    qreal m_Value;
-    int m_DialWidth;
-    QColor m_BackgroundColor;
-    QColor m_DialColor;
-    QColor m_ProgressColor;
-    QColor m_TextColor;
-    QString m_SuffixText;
-    bool m_ShowText;
-    Qt::PenCapStyle m_PenStyle;
-    DialType m_DialType;
-    QFont m_TextFont;
-};
 
-#endif // RADIALBAR_H
+    //=======================================================
+    //== Properties
+
+    DialType dialType = DialType::MinToMax;
+    QColor backgroundColor = Qt::transparent;
+    QColor foregroundColor = QColor(80,80,80);
+    QColor progressColor = QColor(135,26,5);
+    QColor textColor = QColor(20, 20, 20);
+    QFont textFont;
+    QString suffixText;
+    Qt::PenCapStyle penStyle = Qt::FlatCap;
+    bool showText = true;
+    int dialWidth = 15;
+    qreal maxValue = 100;
+    qreal minValue = 0;
+    qreal size = 200;
+    qreal spanAngle = 280;
+    qreal startAngle = 40;
+    qreal value = 50;
+
+signals:
+    void backgroundColorChanged();
+    void dialTypeChanged();
+    void dialWidthChanged();
+    void foregroundColorChanged();
+    void maxValueChanged();
+    void minValueChanged();
+    void penStyleChanged();
+    void progressColorChanged();
+    void showTextChanged();
+    void sizeChanged();
+    void spanAngleChanged();
+    void startAngleChanged();
+    void suffixTextChanged();
+    void textColorChanged();
+    void textFontChanged();
+    void valueChanged();
+};

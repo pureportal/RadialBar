@@ -24,27 +24,22 @@
 ** SOFTWARE.
 ************************************************************************************/
 
+//=======================================================
+//== Includes
+//=======================================================
+
+// Qt
 #include <QPainter>
 
+// Own
 #include "radialbar.h"
 
+//=======================================================
+//== Constructors
+//=======================================================
+
 RadialBar::RadialBar(QQuickItem *parent)
-    : QQuickPaintedItem(parent),
-      m_Size(200),
-      m_StartAngle(40),
-      m_SpanAngle(280),
-      m_MinValue(0),
-      m_MaxValue(100),
-      m_Value(50),
-      m_DialWidth(15),
-      m_BackgroundColor(Qt::transparent),
-      m_DialColor(QColor(80,80,80)),
-      m_ProgressColor(QColor(135,26,5)),
-      m_TextColor(QColor(0, 0, 0)),
-      m_SuffixText(""),
-      m_ShowText(true),
-      m_PenStyle(Qt::FlatCap),
-      m_DialType(DialType::MinToMax)
+    : QQuickPaintedItem(parent)
 {
     setWidth(200);
     setHeight(200);
@@ -52,205 +47,60 @@ RadialBar::RadialBar(QQuickItem *parent)
     setAntialiasing(true);
 }
 
+//=======================================================
+//== Methods
+//=======================================================
+
 void RadialBar::paint(QPainter *painter)
 {
-    double startAngle;
-    double spanAngle;
+    // Predefine variables
+    double startAngle = -90 - this->startAngle;
+    double spanAngle = FullDial != dialType ? 0 - this->spanAngle : -360;
+
+    // Define size
     qreal size = qMin(this->width(), this->height());
     setWidth(size);
     setHeight(size);
     QRectF rect = this->boundingRect();
+
+    // Prepare painter
     painter->setRenderHint(QPainter::Antialiasing);
     QPen pen = painter->pen();
-    pen.setCapStyle(m_PenStyle);
-
-    startAngle = -90 - m_StartAngle;
-    if(FullDial != m_DialType)
-    {
-        spanAngle = 0 - m_SpanAngle;
-    }
-    else
-    {
-        spanAngle = -360;
-    }
+    pen.setCapStyle(penStyle);
 
     //Draw outer dial
     painter->save();
-    pen.setWidth(m_DialWidth);
-    pen.setColor(m_DialColor);
+    pen.setWidth(dialWidth);
+    pen.setColor(foregroundColor);
     painter->setPen(pen);
-    qreal offset = m_DialWidth / 2;
-    if(m_DialType == MinToMax)
-    {
-        painter->drawArc(rect.adjusted(offset, offset, -offset, -offset), startAngle * 16, spanAngle * 16);
-    }
-    else if(m_DialType == FullDial)
-    {
-        painter->drawArc(rect.adjusted(offset, offset, -offset, -offset), -90 * 16, -360 * 16);
-    }
-    else
-    {
-        //do not draw dial
-    }
+    qreal offset = dialWidth / 2;
+    if(dialType == MinToMax) painter->drawArc(rect.adjusted(offset, offset, -offset, -offset), static_cast< int >(startAngle * 16), static_cast< int >(spanAngle * 16));
+    else if(dialType == FullDial) painter->drawArc(rect.adjusted(offset, offset, -offset, -offset), -90 * 16, -360 * 16);
     painter->restore();
 
     //Draw background
     painter->save();
-    painter->setBrush(m_BackgroundColor);
-    painter->setPen(m_BackgroundColor);
+    painter->setBrush(backgroundColor);
+    painter->setPen(backgroundColor);
     qreal inner = offset * 2;
     painter->drawEllipse(rect.adjusted(inner, inner, -inner, -inner));
     painter->restore();
 
     //Draw progress text with suffix
     painter->save();
-    painter->setFont(m_TextFont);
-    pen.setColor(m_TextColor);
+    painter->setFont(textFont);
+    pen.setColor(textColor);
     painter->setPen(pen);
-    if(m_ShowText)
-    {
-        painter->drawText(rect.adjusted(offset, offset, -offset, -offset), Qt::AlignCenter,QString::number(m_Value) + m_SuffixText);
-    }
-    else
-    {
-        painter->drawText(rect.adjusted(offset, offset, -offset, -offset), Qt::AlignCenter, m_SuffixText);
-    }
+    if(showText) painter->drawText(rect.adjusted(offset, offset, -offset, -offset), Qt::AlignCenter,QString::number(value) + suffixText);
+    else painter->drawText(rect.adjusted(offset, offset, -offset, -offset), Qt::AlignCenter, suffixText);
     painter->restore();
 
     //Draw progress bar
     painter->save();
-    pen.setWidth(m_DialWidth);
-    pen.setColor(m_ProgressColor);
-    qreal valueAngle = ((m_Value - m_MinValue)/(m_MaxValue - m_MinValue)) * spanAngle;  //Map value to angle range
+    pen.setWidth(dialWidth);
+    pen.setColor(progressColor);
+    qreal valueAngle = ((value - minValue)/(maxValue - minValue)) * spanAngle;  //Map value to angle range
     painter->setPen(pen);
-    painter->drawArc(rect.adjusted(offset, offset, -offset, -offset), startAngle * 16, valueAngle * 16);
+    painter->drawArc(rect.adjusted(offset, offset, -offset, -offset), static_cast< int >(startAngle * 16), static_cast< int >(valueAngle * 16));
     painter->restore();
-}
-
-void RadialBar::setSize(qreal size)
-{
-    if(m_Size == size)
-        return;
-    m_Size = size;
-    emit sizeChanged();
-}
-
-void RadialBar::setStartAngle(qreal angle)
-{
-    if(m_StartAngle == angle)
-        return;
-    m_StartAngle = angle;
-    emit startAngleChanged();
-}
-
-void RadialBar::setSpanAngle(qreal angle)
-{
-    if(m_SpanAngle == angle)
-        return;
-    m_SpanAngle = angle;
-    emit spanAngleChanged();
-}
-
-void RadialBar::setMinValue(qreal value)
-{
-    if(m_MinValue == value)
-        return;
-    m_MinValue = value;
-    emit minValueChanged();
-}
-
-void RadialBar::setMaxValue(qreal value)
-{
-    if(m_MaxValue == value)
-        return;
-    m_MaxValue = value;
-    emit maxValueChanged();
-}
-
-void RadialBar::setValue(qreal value)
-{
-    if(m_Value == value)
-        return;
-    m_Value = value;
-    update();   //update the radialbar
-    emit valueChanged();
-}
-
-void RadialBar::setDialWidth(qreal width)
-{
-    if(m_DialWidth == width)
-        return;
-    m_DialWidth = width;
-    emit dialWidthChanged();
-}
-
-void RadialBar::setBackgroundColor(QColor color)
-{
-    if(m_BackgroundColor == color)
-        return;
-    m_BackgroundColor = color;
-    emit backgroundColorChanged();
-}
-
-void RadialBar::setForegroundColor(QColor color)
-{
-    if(m_DialColor == color)
-        return;
-    m_DialColor = color;
-    emit foregroundColorChanged();
-}
-
-void RadialBar::setProgressColor(QColor color)
-{
-    if(m_ProgressColor == color)
-        return;
-    m_ProgressColor = color;
-    emit progressColorChanged();
-}
-
-void RadialBar::setTextColor(QColor color)
-{
-    if(m_TextColor == color)
-        return;
-    m_TextColor = color;
-    emit textColorChanged();
-}
-
-void RadialBar::setSuffixText(QString text)
-{
-    if(m_SuffixText == text)
-        return;
-    m_SuffixText = text;
-    emit suffixTextChanged();
-}
-
-void RadialBar::setShowText(bool show)
-{
-    if(m_ShowText == show)
-        return;
-    m_ShowText = show;
-}
-
-void RadialBar::setPenStyle(Qt::PenCapStyle style)
-{
-    if(m_PenStyle == style)
-        return;
-    m_PenStyle = style;
-    emit penStyleChanged();
-}
-
-void RadialBar::setDialType(RadialBar::DialType type)
-{
-    if(m_DialType == type)
-        return;
-    m_DialType = type;
-    emit dialTypeChanged();
-}
-
-void RadialBar::setTextFont(QFont font)
-{
-    if(m_TextFont == font)
-        return;
-    m_TextFont = font;
-    emit textFontChanged();
 }
